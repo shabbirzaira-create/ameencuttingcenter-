@@ -174,16 +174,11 @@
     font-size:clamp(1.9rem,4.5vw,3rem);
     color:var(--ink); min-height:1.6em;
   }
-  .intro-text .tl{ transition:color .2s ease; }
-  .intro-text .tl[data-c="0"]{ color:var(--teal); }
-  .intro-text .tl[data-c="1"]{ color:var(--violet); }
-  .intro-text .tl[data-c="2"]{ color:var(--pink); }
-  .intro-text .tl[data-c="3"]{ color:var(--mint); }
+  .intro-text .tl{ color:var(--teal-dark); }
   .intro-text .cursor{
     display:inline-block; width:3px; height:0.9em; vertical-align:-2px;
-    background:var(--violet); margin-left:3px;
+    background:var(--teal-dark); margin-left:3px;
     animation:blink 1s step-end infinite;
-    transition:background .2s ease;
   }
   .intro-text .cursor.solid{ animation:none; opacity:1; }
   @keyframes blink{ 50%{ opacity:0; } }
@@ -629,9 +624,7 @@
     var idx = 0, pi = 0, deleting = false, subDone = false;
 
     function colorize(text){
-      return text.split('').map(function(ch){
-        return '<span class="tl" data-c="' + (ch.charCodeAt(0) % 4) + '">' + ch + '</span>';
-      }).join('');
+      return '<span class="tl">' + text + '</span>';
     }
 
     function typeLoop(){
