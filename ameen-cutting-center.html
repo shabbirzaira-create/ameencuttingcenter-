@@ -236,14 +236,16 @@
   .phone-num:hover{ color:var(--teal); }
   form{ display:flex; flex-direction:column; gap:12px; }
   form input, form textarea{
-    font-family:'Inter', sans-serif; font-size:0.92rem; padding:12px 14px;
+    font-family:'Inter', sans-serif; font-size:0.95rem; padding:12px 14px;
     border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink);
+    font-weight:600; letter-spacing:0.01em;
   }
+  form input::placeholder, form textarea::placeholder{ color:var(--slate); font-weight:600; }
   form input:focus, form textarea:focus{ outline:2px solid var(--teal); border-color:var(--teal); }
   form textarea{ resize:vertical; min-height:90px; }
   form button{
     align-self:flex-start; background:var(--grad); color:#fff; border:none;
-    padding:12px 22px; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.92rem;
+    padding:12px 26px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.95rem;
     box-shadow:0 8px 20px -8px rgba(14,165,233,0.7);
   }
   form button:hover{ transform:translateY(-1px); }
