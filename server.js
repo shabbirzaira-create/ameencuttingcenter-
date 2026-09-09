@@ -47,6 +47,7 @@ const Order = mongoose.model('Order', OrderSchema);
 const RatingSchema = new mongoose.Schema({
   name: { type: String, required: true },
   rating: { type: Number, required: true, min: 1, max: 5 },
+  message: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },
 });
 
@@ -106,7 +107,7 @@ app.get('/api/orders', async (_req, res) => {
 
 app.post('/api/ratings', async (req, res) => {
   try {
-    const { name, rating } = req.body;
+    const { name, rating, message } = req.body;
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Name is required.' });
     }
@@ -114,15 +115,21 @@ app.post('/api/ratings', async (req, res) => {
     if (!Number.isInteger(r) || r < 1 || r > 5) {
       return res.status(400).json({ error: 'Rating must be between 1 and 5.' });
     }
-    const created = await Rating.create({ name: name.trim(), rating: r });
+    const created = await Rating.create({
+      name: name.trim(),
+      rating: r,
+      message: String(message || '').trim(),
+    });
 
     if (brevo && process.env.NOTIFY_EMAIL && process.env.FROM_EMAIL) {
       try {
         const stars = '★'.repeat(r);
+        const msg = String(message || '').trim() || '—';
         const html =
           '<h3>New Rating Received</h3>' +
           '<p><b>Name:</b> ' + escapeHtml(name.trim()) + '</p>' +
           '<p><b>Rating:</b> ' + stars + ' (' + r + '/5)</p>' +
+          '<p><b>Message:</b> ' + escapeHtml(msg) + '</p>' +
           '<p><b>Message sentiment:</b> ' + (r >= 4 ? '😊 Customer is happy' : r === 3 ? '😐 Neutral — maybe follow up' : '😟 Customer is unhappy — please follow up') + '</p>';
         await brevo.transactionalEmails.sendTransacEmail({
           subject: '⭐ New ' + r + '/5 rating from ' + name.trim(),

@@ -320,12 +320,13 @@
     display:flex; gap:12px; justify-content:center; align-items:center;
     margin-top:22px; flex-wrap:wrap;
   }
-  .rating-form input{
+  .rating-form input, .rating-form textarea{
     font-family:'Inter', sans-serif; font-size:0.92rem; padding:11px 14px;
     border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--ink);
     width:220px; max-width:100%;
   }
-  .rating-form input:focus{ outline:2px solid var(--teal); border-color:var(--teal); }
+  .rating-form textarea{ width:100%; min-height:70px; resize:vertical; }
+  .rating-form input:focus, .rating-form textarea:focus{ outline:2px solid var(--teal); border-color:var(--teal); }
   .rating-form button{
     background:var(--grad); color:#fff; border:none; padding:11px 22px;
     border-radius:8px; font-weight:600; cursor:pointer; font-size:0.92rem;
@@ -363,6 +364,7 @@
   .rater-info{ min-width:0; }
   .rater-info b{ display:block; color:var(--ink); font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .rater-stars{ color:#FBBF24; font-size:0.9rem; letter-spacing:1px; }
+  .rater-msg{ color:var(--muted); font-size:0.82rem; margin-top:6px; line-height:1.45; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
   .rater-empty{
     grid-column:1/-1; text-align:center; color:var(--muted);
     font-family:'JetBrains Mono', monospace; font-size:0.85rem; letter-spacing:0.05em;
@@ -502,6 +504,7 @@
 
   <form id="rating-form" class="rating-form" autocomplete="off">
     <input type="text" id="r-name" placeholder="Your name" required>
+    <textarea id="r-message" placeholder="Your message (optional)"></textarea>
     <button type="submit" id="r-btn">Submit rating</button>
   </form>
 </section>
@@ -680,6 +683,7 @@
     var label = document.getElementById('rating-label');
     var form = document.getElementById('rating-form');
     var nameInput = document.getElementById('r-name');
+    var msgInput = document.getElementById('r-message');
     var btn = document.getElementById('r-btn');
     var chosen = 0;
     var msgs = ['','Poor','Fair','Good','Very Good','Excellent'];
@@ -714,7 +718,9 @@
             return '<div class="rater-card">' +
               '<div class="rater-avatar">' + initial + '</div>' +
               '<div class="rater-info"><b>' + esc(r.name) + '</b>' +
-              '<div class="rater-stars">' + starsStr + '</div></div></div>';
+              '<div class="rater-stars">' + starsStr + '</div>' +
+              (r.message ? '<div class="rater-msg">' + esc(r.message) + '</div>' : '') +
+              '</div></div>';
           }).join('');
         })
         .catch(function(){ });
@@ -754,7 +760,7 @@
       fetch('/api/ratings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, rating: chosen })
+        body: JSON.stringify({ name: name, rating: chosen, message: msgInput.value.trim() })
       }).then(function(res){
         return res.json().then(function(d){ return { ok: res.ok, d: d }; });
       }).then(function(res){
