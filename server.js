@@ -111,6 +111,9 @@ app.post('/api/ratings', async (req, res) => {
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Name is required.' });
     }
+    if (!message || !String(message).trim()) {
+      return res.status(400).json({ error: 'Message is required.' });
+    }
     const r = Number(rating);
     if (!Number.isInteger(r) || r < 1 || r > 5) {
       return res.status(400).json({ error: 'Rating must be between 1 and 5.' });
@@ -118,7 +121,7 @@ app.post('/api/ratings', async (req, res) => {
     const created = await Rating.create({
       name: name.trim(),
       rating: r,
-      message: String(message || '').trim(),
+      message: String(message).trim(),
     });
 
     if (brevo && process.env.NOTIFY_EMAIL && process.env.FROM_EMAIL) {
