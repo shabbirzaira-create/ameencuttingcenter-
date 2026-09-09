@@ -115,6 +115,27 @@ app.post('/api/ratings', async (req, res) => {
       return res.status(400).json({ error: 'Rating must be between 1 and 5.' });
     }
     const created = await Rating.create({ name: name.trim(), rating: r });
+
+    if (brevo && process.env.NOTIFY_EMAIL && process.env.FROM_EMAIL) {
+      try {
+        const stars = '★'.repeat(r);
+        const html =
+          '<h3>New Rating Received</h3>' +
+          '<p><b>Name:</b> ' + escapeHtml(name.trim()) + '</p>' +
+          '<p><b>Rating:</b> ' + stars + ' (' + r + '/5)</p>' +
+          '<p><b>Message sentiment:</b> ' + (r >= 4 ? '😊 Customer is happy' : r === 3 ? '😐 Neutral — maybe follow up' : '😟 Customer is unhappy — please follow up') + '</p>';
+        await brevo.transactionalEmails.sendTransacEmail({
+          subject: '⭐ New ' + r + '/5 rating from ' + name.trim(),
+          htmlContent: html,
+          sender: { email: process.env.FROM_EMAIL, name: process.env.FROM_NAME || 'Ameen Cutting Center' },
+          to: [{ email: process.env.NOTIFY_EMAIL, name: 'Shop Owner' }],
+        });
+        console.log('📧 Rating notification email sent to', process.env.NOTIFY_EMAIL);
+      } catch (mailErr) {
+        console.error('❌ Rating email send failed:', mailErr.message);
+      }
+    }
+
     res.status(201).json({ success: true, id: created._id, name: created.name });
   } catch (err) {
     res.status(500).json({ error: err.message });
